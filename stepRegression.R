@@ -12,7 +12,7 @@ looking at all 15 possible lm models.
 library(leaps)
 tmp<-regsubsets(mpg ~ wt + drat + disp + qsec, data=mtcars, nbest=1000, really.big=T, intercept=F)
 all.mods <- summary(tmp)[[1]]
-all.mods <- lapply(1:nrow(all.mods, function(x)as.formula(paste("mpg~", paste(names(which(all.mods[x,])), collapse="+"))))
+all.mods <- lapply(1:nrow(all.mods, function(x)as.formula( paste("mpg~", paste(names(which(all.mods[x,])), collapse="+")))
 
 head(all.mods)
 
@@ -31,7 +31,7 @@ summary(model)
 model <-step(model, direction='both', criterion='BIC')
 model
 
-#only qsec is relevant
+#only qsec is relevant - lowest AIC
 
 #What is the probability that this engine is S -Straight
 newdata = data.frame(wt = 2.1, qsec = 17,wt=3500 )

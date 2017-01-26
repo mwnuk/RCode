@@ -8,6 +8,11 @@ plot(faithful[, -3], main = f.tit,
 lines(lowess(faithful$eruptions, faithful$waiting, f = 2/3, iter = 3),
       col = "red")
 )
+#  help (lowess)
+
+
+#SIMPLE LINIAR MODEL
+#--------------------------------------------
 attach(faithful)     # attach the data frame 
 eruption.lm = lm(eruptions ~ waiting) 
 
@@ -19,7 +24,7 @@ predict(eruption.lm, newdata, interval="predict")
 #80 minutes is between 3.1961 and 5.1564 minutes. 
 
 
-help(predict.lm) 
+#help(predict.lm) 
 
 predict(eruption.lm, newdata, interval="predict",level=0.6) 
 
@@ -52,6 +57,6 @@ rbind - adding rows
 
 
 
-###########################################################################
-help (lowess)
+
+
 
