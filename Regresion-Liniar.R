@@ -1,34 +1,37 @@
 http://www.r-tutor.com/elementary-statistics/simple-linear-regression/prediction-interval-linear-regression
-?faithful
-summary(faithful)
-faithful
-plot(faithful[, -3], main = f.tit,
-     xlab = "Eruption time (min)",
-     ylab = "Waiting time to next eruption (min)")
-lines(lowess(faithful$eruptions, faithful$waiting, f = 2/3, iter = 3),
-      col = "red")
-)
+
+
+
+##################################################
+# SIMPLE LINIAR MODEL
+##################################################
+
+	?faithful
+	summary(faithful)
+	faithful
+	plot(faithful[, -3], main = f.tit,
+     		xlab = "Eruption time (min)",
+     	ylab = "Waiting time to next eruption (min)")
+	lines(lowess(faithful$eruptions, faithful$waiting, f = 2/3, iter = 3),
+      	col = "red")
+	)
 #  help (lowess)
 
+	attach(faithful)     # attach the data frame 
+	eruption.lm = lm(eruptions ~ waiting) 
 
-#SIMPLE LINIAR MODEL
-#--------------------------------------------
-attach(faithful)     # attach the data frame 
-eruption.lm = lm(eruptions ~ waiting) 
+	newdata = data.frame(waiting=80) 
 
-newdata = data.frame(waiting=80) 
-
-predict(eruption.lm, newdata, interval="predict") 
+	predict(eruption.lm, newdata, interval="predict") 
 
 #The 95% prediction interval of the eruption duration for the waiting time of 
 #80 minutes is between 3.1961 and 5.1564 minutes. 
 
-
 #help(predict.lm) 
 
-predict(eruption.lm, newdata, interval="predict",level=0.6) 
+	predict(eruption.lm, newdata, interval="predict",level=0.6) 
 
-predict(eruption.lm,  interval="predict",level=0.6) 
+	predict(eruption.lm,  interval="predict",level=0.6) 
 
 ###########################################################################
 x <- rnorm(15)
@@ -56,7 +59,25 @@ rbind - adding rows
 [2,] "20" "[]" "[[1,3]]"
 
 
+###########################################################################
+## MULTIPLE LINIAR REGRESSION
+###########################################################################
+library(MASS)
+library(ISLR)
 
+BOSTON 
+
+
+	lm.fit=lm(medv~lstat+age,data=Boston)
+	summary(lm.fit)
+	lm.fit=lm(medv~.,data=Boston)
+	summary(lm.fit)
+	library(car)
+	vif(lm.fit)
+#when all is considered, age is not signifficant any more, remove it
+	lm.fit1=lm(medv~.-age,data=Boston)
+	summary(lm.fit1)
+	lm.fit1=update(lm.fit, ~.-age)
 
 
 
