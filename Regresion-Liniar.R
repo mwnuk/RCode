@@ -1,5 +1,10 @@
 http://www.r-tutor.com/elementary-statistics/simple-linear-regression/prediction-interval-linear-regression
 
+### HANDLING NA #####
+options("na.action")  # global setting
+na.omit or na.exclude  - skip
+na.pass - keep all data including NAs
+na.fail - return object only if contains no missing values
 
 
 ##################################################

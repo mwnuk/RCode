@@ -31,6 +31,8 @@ step(lm(mpg~wt+drat+disp+qsec,data=mtcars),direction="backward")
 
 	model <-step(model, direction='both', criterion='BIC')
 	model
+	model1= stepAIC(model,direction='both')
+      
 
 #only qsec is relevant - lowest AIC
 

@@ -48,6 +48,7 @@
 	legend("bottomright",c("Observ.","Signal","Predicted"), 
        col=c("deepskyblue4","red","green"), lwd=3)
 
+
 #################################################################################################
 
 
