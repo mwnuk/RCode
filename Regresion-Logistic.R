@@ -34,5 +34,7 @@
 	xweight <- seq(0, 6, 0.01)
 	plot(mtcars$wt, mtcars$vs, pch = 16, xlab = "WEIGHT (g)", ylab = "VS")
 	lines(xweight, yweight)
-
+#Box Plot
+	p <- ggplot(mpg, aes(class, hwy))
+	p + geom_boxplot()
 

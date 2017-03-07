@@ -3,7 +3,7 @@
 #################################################################
 library( data.table)
 
-#train<-fread("https://www.dropbox.com/s/3bk6sjw0xkfl5xr/AAPL.csv?raw=1")  #AAPL
+#train<-fread("https://www.dropbox.com/s/3bk6sjw0xkfl5xr/AAPL.csv?raw=1") #AAPL
 #train<-fread("https://www.dropbox.com/s/1pw6w0r8k4mth04/BA1.csv?raw=1")  #BA
 #train<-fread("https://www.dropbox.com/s/oskhoty4jie6dft/C1.csv?raw=1")   #C
 #train<-fread("https://www.dropbox.com/s/amnhzzm4k66f766/MSFT.csv?raw=1") #MSFT
@@ -14,15 +14,17 @@ library( data.table)
 ## Read from local drive
 #################################################################
 #library( data.table)
-train<-fread("C:\\try\\R\\Quotes\\aapl.csv")
+train<-fread("C:\\try\\R\\Quotes\\ba.csv",header=TRUE)
+train<-train[order(date)] 
 
-
-#train<-train[250:505]
+dji<-fread("C:\\try\\R\\Quotes\\dji.csv",header=TRUE)
+dji<-dji[order(Date)] 
+#train<-train[168:170]
 #349 350 351 
 x<-seq(1, to=length(train$close))
 
-which( is.na(train$loss))
-
+which( is.na(train$tgt))
+which(train$tgt>1)
 train<-transform( train,close=as.numeric(close)
                        ,open=as.numeric(open)
                        ,high=as.numeric(high)
@@ -68,7 +70,7 @@ D20 <- function ( data){
 	total<-length(data) 
 	#spots<-seq(from=1,to=total)
 	result <-vector(length=length(data))
-	for( i in 4:total-1 ){gain
+	for( i in 4:total-1 ){
 
 	   if ( data[ i-1 ] < 0.18  & data[ i+1 ] > 0.21 )
 	 	result[i]<-  1
@@ -130,14 +132,15 @@ targetFunct <- function ( data,window){
 		{
         	  	if( (mx-fst)/fst >0.05) # its 5% now and it makes a big AIC
               	result[i] =1
-         	# else
-              	#result[i] =0 
+         	  else
+              	result[i] =0 
 		}
 		#else
 			#result[i] =0
        }
 	return (result)
 }
+
 ####################################################
 ## All values to train data frame as extra columns
 ####################################################
@@ -153,12 +156,23 @@ train <- cbind( train,D20=D20( train$Dval ) )
 train <- cbind( train,D20Raise=D20Raise( train,5) )
 train <- cbind( train,RSI=RSI( train, 14 ))
 #names(train)
+####################################################
+## PAIRS
+####################################################
+
+library("psych") # pairs panels
+train[,"date"]<-NULL 
+train[,"gain"]<-NULL 
+train[,"loss"]<-NULL 
+
+summary(train)
+pairs.panels(train)
 
 ####################################################
 ## MODELS
-####################################################
+####################################################val
 
-glm.fit <- glm(tgt~close+open+high+low+high*low+avg30+avg100+D20+RSI,data=train,family=binomial)
+#glm.fit <- glm(tgt~close+open+high+low+high*low+avg30+avg100+Dval+RSI,data=train,family=binomial)
 #glm.fit <- glm(tgt~close+open+high+low+gain,data=train,family=binomial)
 #glm.fit <- glm(tgt~close+I(close^2)+ I(close^3)+avg30+avg100+D20,data=train,family=binomial)
 #glm.fit <- glm(tgt~close+I(close^2)+ I(close^3)+I(close^4)+I(close^5)+avg30+avg100+D20,data=train,family=binomial)
@@ -172,8 +186,8 @@ predicted.intervals <- predict(polymodel,data.frame(x=x),interval='confidence',l
 #glm.fit <- glm(tgt~. + high*low,data=train,family=binomial)
 
 ###### STEP REGRESSION
-model <- glm(tgt~close+open+high+low+high*low+avg30+avg100+D20+RSI,data=train,family=binomial)
-#glm.fit<-step(model, direction='both', criterion='BIC')
+model <- glm(tgt~close+open+high+low+high*low+avg30+avg100+Dval+RSI,data=train,family=binomial)
+glm.fit<-step(model, direction='both', criterion='BIC')
 
 
 ####################################################
