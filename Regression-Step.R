@@ -21,6 +21,12 @@ help(regsubsets)
 	sapply(all.lm, extractAIC)[2,]
 
 
+#Step forward only:
+	library(ISLR)
+	regfit.fwd=regsubsets(Salary~.,data=Hitters,nvmax=19,method="forward")
+# you can see that each new step contains all previous components plus one more       
+      summary( regfit.fwd)
+      plot(regfit.fwd,scale="Cp")
 ########################################################################
 ## STEP ON LOGISTIC REGRESION
 ########################################################################

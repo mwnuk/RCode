@@ -48,10 +48,9 @@ http://stats.stackexchange.com/questions/72251/an-example-lasso-regression-using
 
 	coef(glmmod)[, 10]
 
-#We do this by the crossvalidation function of glmnet. If you have never heard of crossvalidation, 
-#all you need to know is that it is a predictive criterion that evaluates the sample performance 
-#by splitting the sample into training and validation sets and choosing the value of lambda with 
-#which the error of prediction is minimal.
+#We do this by the crossvalidation function of glmnet. Crossvalidation is a predictive criterion 
+#that evaluates the sample performance #by splitting the sample into training and validation sets 
+#and choosing the value of lambda with which the error of prediction is minimal.
 
 	cv.glmmod <- cv.glmnet(x, y=asthma, alpha=1)
 	plot(cv.glmmod)
