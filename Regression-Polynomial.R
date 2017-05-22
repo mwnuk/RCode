@@ -1,5 +1,13 @@
-#https://www.r-bloggers.com/fitting-polynomial-regression-in-r/
+# NONLINIAR MODELS
+# 1.Polynomials
+# 2.Step function
+# 1.Splines
+# 2.Local Regression
+# 1.General Additive Models GAM
 
+
+# 1. POLYNOMIALS
+#https://www.r-bloggers.com/fitting-polynomial-regression-in-r/
 #Danger:high order polynomials (n > 4) may lead to over-fitting
 
 
@@ -49,5 +57,43 @@
        col=c("deepskyblue4","red","green"), lwd=3)
 
 #################################################################################################
+
+# Another example of Polynomial fit from ISLR
+	library(ISLR)
+	attach(Wage)
+
+	fit=lm(wage~poly(age,4),data=Wage)
+	coef(summary(fit))
+#notice that first two coefficients are signifficant, 3 one litte less,
+# so looks like cubic polynomial would be sufficient.
+	fit2=lm(wage~poly(age,4,raw=T),data=Wage)
+	coef(summary(fit2))
+	fit2a=lm(wage~age+I(age^2)+I(age^3)+I(age^4),data=Wage)
+	coef(fit2a)
+	fit2b=lm(wage~cbind(age,age^2,age^3,age^4),data=Wage)
+
+#prepare the plot:
+
+	agelims=range(age)
+	age.grid=seq(from=agelims[1],to=agelims[2])  # default by 1 
+      age.grid   # sequence of integers
+
+	preds=predict(fit,newdata=list(age=age.grid),se=TRUE) #with se standard errors
+
+	se.bands=cbind(preds$fit+2*preds$se.fit,preds$fit-2*preds$se.fit)  
+
+	par(mfrow=c(1,2),mar=c(4.5,4.5,1,1),oma=c(0,0,4,0))
+	plot(age,wage,xlim=agelims,cex=.5,col="darkgrey")
+	title("Degree-4 Polynomial",outer=T)
+	lines(age.grid,preds$fit,lwd=2,col="blue")
+	matlines(age.grid,se.bands,lwd=1,col="blue",lty=3)
+
+
+
+
+
+
+
+
 
 
