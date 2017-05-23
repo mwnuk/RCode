@@ -1,26 +1,36 @@
-Supervised Learning we have choices like NaiveBayes, K nearest neighbours
-using Decision Tree or Classification Tree
+#DECISION TREES
+# - split on Gini Index, Chi-Square or Entropy for categorical target variable
+# - split on Reduction in Varaince for continuous targetvariables
+# - pruning or setting constrains on tree size to avoid overfitting
+#   package RPART provides a function to prune
+# - R packages: ctree, rpart, tree
+#We have choices like NaiveBayes, K nearest neighbours
+#using Decision Tree or Classification Tree
 
-PACKAGE C50
 
 install.packages("C50")
-library(C50)
-data(iris)
-head(iris)
+	library(C50)
+	data(iris)
+	head(iris)
 
 #predict flower species using Classification Tree from package C50
 
-#don't want any order
-set.seed(9850)
-g<-runif(nrow(iris)) 
-irisr<-iris[order(g),]
-head(irisr)
 
-C5.0(training data, test data)
-m1<-C5.0(irisr[1:100,-5], irisr[1:100,5])
-m1  #4 leafs
+#don't want any order - irisr is randomized
+	set.seed(9850)
+	g<-runif(nrow(iris)) 
+	irisr<-iris[order(g),]
+	head(irisr)
 
-summary(m1)
+#C5.0(training data, test data)
+# training data: take first 100 rows as  and eliminate target feature at 5 column
+# target data is a column 5 Species
+	
+	m1<-C5.0(irisr[1:100,-5], irisr[1:100,5])
+
+# so m1 has 4 leafs
+
+summary(m1) is more informative 
 
 Shows:
 
@@ -47,11 +57,13 @@ Evaluation on training data (100 cases):
             34                (a): class setosa
                   35          (b): class versicolor
                         31    (c): class virginica
-###########
-p1<-predict(m1,irisr[101:150,])
+#################################################################################
+	
+	p1<-predict(m1,irisr[101:150,])   # model against test data 
 
 #construct confusion matrix  Actual vs Predicted
-table( irisr[101:150,5],Predicted=p1)
+
+	table( irisr[101:150,5],Predicted=p1)
 
              Predicted
              setosa versicolor virginica
@@ -65,23 +77,28 @@ performance is 47/50
 ## draw the plot, works well on small sets
 plot(m1)
 
+
+
+
+
 #############################################################################################
 
-## ANOTHER PACKAGE
-library(rpart) # another package 
-install.packages("rpart.plot")
-library(rpart.plot)
+## ANOTHER PACKAGE RPART and RPART.PLOT
+	library(rpart)
+	library(rpart.plot)
+We are predicting categorical value Species in a 5th column, we use classification tree
 
 #don't want any order - shuffle the deck
-set.seed(9850)
-g<-runif(nrow(iris)) 
-irisr<-iris[order(g),]
-head(irisr)
+	set.seed(9850)
+	g<-runif(nrow(iris)) 
+	irisr<-iris[order(g),]
+	head(irisr)
 
-#rpart works similar to lm ( target~predictors,dataset,method=classification tree)
+#rpart works similar to lm ( target~predictors,dataset,method=classification tree) where . means all possible predictors
+#first 100 rows are training
+	m3<-rpart( Species ~ .,irisr[1:100,], method="class" ) 
+	m3
 
-m3<-rpart( Species ~ .,irisr[1:100,], method="class" ) 
-m3
 
 outputs:
 node), split, n, loss, yval, (yprob)
@@ -95,18 +112,19 @@ node), split, n, loss, yval, (yprob)
 > 
 
 
-rpart creates plot 
+#rpart creates nice plot 
 
-rpart.plot(m3) 
+	rpart.plot(m3) 
 #plot with some options
-rpart.plot(m3,type=3,extra=101,fallen.leaves=T) 
+	rpart.plot(m3,type=3,extra=101,fallen.leaves=T) 
 
-summary(m3)
+	summary(m3)
 
-p3<-predict(m3,irisr[101:150,],type="class")
+#validate prediction 
+	p3<-predict(m3,irisr[101:150,],type="class")
 
 #construct CONFUSION MATRIX  Actual vs Predicted
-table( irisr[101:150,5],predicted=p3)
+	table( irisr[101:150,5],predicted=p3)
 
 
 outputs:
@@ -117,6 +135,48 @@ outputs:
   virginica       0          2        17
                              --error 
 Prediction performance 46/50  
+
+##############################################################################33
+
+   Regression Decision Tree 
+	
+##############################################################################33
+	library(rpart)
+	library(rpart.plot)
+      library (ggplot2) # for mamal sleep data
+	data() # show all data sets
+
+	data(sleep) #from package ggplot2
+# msleep dataset has 11 variables, 83 observations	
+	msleep
+#take only subset by eliminate some columns 
+      df<-msleep[,c(3,6,10,11)]
+
+#variables: vore is carnivore or omnivore , sleep total, brain weight, body weight 
+
+# goal is to predict total sleep hours for a given mammal 
+
+	m1<-rpart(sleep_total~ .,data=df,method="anova") 
+ 
+      m1
+#so, there were 83 observations, first split was on BodyWeight which was most predictive 
+#show plot
+	rpart.plot(m1)
+      rpart.plot(m1,type=3,digits=3,fallen.leaves=TRUE)
+
+# test value is same as train in this case 
+	p1=predict(m1,df) 
+
+# asses the accuracy by calculation Mean Absolute Error - create a small function
+
+    MAE<-function( actual, predicted) { mean(abs(actual-predicted))}
+
+    MAE( df$sleep_total, p1) 
+# MAE is 2.45
+
+
+
+
 
 
 
