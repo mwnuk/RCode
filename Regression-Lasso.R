@@ -10,7 +10,7 @@ http://stats.stackexchange.com/questions/72251/an-example-lasso-regression-using
 # Liniar regression is have small error from Bias and large from a Variance
 # This method will increase Bias but minimize the Variance
 # The goal is to find optimal lambda which is a weight between Bias and Varaince
-
+# When shrinkage parameter lambda is zero it becomes regular liniar regression
 ###############################################################
 ## LASSO FOR BINARY OUTPUT
 ###############################################################
@@ -48,10 +48,9 @@ http://stats.stackexchange.com/questions/72251/an-example-lasso-regression-using
 
 	coef(glmmod)[, 10]
 
-#We do this by the crossvalidation function of glmnet. If you have never heard of crossvalidation, 
-#all you need to know is that it is a predictive criterion that evaluates the sample performance 
-#by splitting the sample into training and validation sets and choosing the value of lambda with 
-#which the error of prediction is minimal.
+#We do this by the crossvalidation function of glmnet. Crossvalidation is a predictive criterion 
+#that evaluates the sample performance #by splitting the sample into training and validation sets 
+#and choosing the value of lambda with which the error of prediction is minimal.
 
 	cv.glmmod <- cv.glmnet(x, y=asthma, alpha=1)
 	plot(cv.glmmod)
@@ -91,4 +90,10 @@ y <- 3 + 4*x1 + 3*x2 + 5*x3 + rnorm(30)
 	penalty #minimal shrinkage
 	fit1 <-glmnet(x = X, y = y, alpha = 1, lambda = penalty ) #estimate the model with that
 	coef(fit1)
+
+
+
+
+
+
 
