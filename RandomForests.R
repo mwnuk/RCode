@@ -10,17 +10,92 @@
 https://www.analyticsvidhya.com/blog/2016/04/complete-tutorial-tree-based-modeling-scratch-in-python/
 
 #----------------------------------------------------------------------------------
-# RANDOM FOREST 
-library(randomForest)
-x <- cbind(x_train,y_train)
-# Fitting model
-fit <- randomForest(Species ~ ., x,ntree=500)
-summary(fit)
-#Predict Output 
-predicted= predict(fit,x_test)
+######################################################################
+# BAGGING from islr
+######################################################################
+	library(MASS)
+	library(randomForest)
+	set.seed(1)
+      dim(Boston)
+# build train set of 300 out of total of 506 records
+	train = sample(1:nrow(Boston), 300)
+#response is medv - medium value of the house
+	bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
+	bag.boston
+#Bagging
+	yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+	plot(yhat.bag, boston.test)
+	abline(0,1)
+	mean((yhat.bag-boston.test)^2)
+
+#limit number of trees to 25
+	bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,ntree=25)
+	yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+	mean((yhat.bag-boston.test)^2)
+
+
+######################################################################
+# RANDOM FOREST from islr
+######################################################################
+
+#RandomForest grows 500 trees - 
+# mtry is only tuning parameter ( number of variables selected at each split, 
+#                                 example: from 13 parameters in Housing data we pick 6 random to consider at evert split )  
+	set.seed(1)
+	rf.boston=randomForest(medv~.,data=Boston,subset=train,mtry=6,importance=TRUE)
+	yhat.rf = predict(rf.boston,newdata=Boston[-train,])
+	mean((yhat.rf-boston.test)^2)
+	importance(rf.boston)
+
+# find a good mtry
+	oob.err = double(13)
+      test.err= double(13) 
+	for( mtry in (1:13) ){
+		fit=randomForest(medv~.,data=Boston,subset=train,mtry=mtry,mtree=400)
+	    #exract Mean Square Error (mse) 
+		oob.err[mtry]=fit$mse[400]
+	    #predict on test data ( minus train) 
+            pred=predict(fit,Boston[-train,])
+          #compute mean square erorr with construction
+		test.err[mtry]=with(Boston[-train,],mean((medv-pred)^2))
+	}
+#plot error
+	matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Square Error")
+	legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
+#conclusion: 1. best value is around 4
+             2. error came down from 26 for 1 variable to eleven - powerful technique
+             4  at 13 variables it it bagging, so there is a slight improvement from bagging
+   
+
+######################################################################
+# BOOSTING from islr
+######################################################################
+# boosting grows shorter trees, 
+	library(MASS)
+	library(gbm)
+	set.seed(1)
+#Ask boosting to 10000 trees, depth means amount of splits at each of the trees
+	boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=10000,interaction.depth=4)
+	summary(boost.boston)
+#summary shows var importance: rm and lstat(% of low status peaple) are most important variables
+	par(mfrow=c(1,2))
+	plot(boost.boston,i="rm")
+	plot(boost.boston,i="lstat")
+#predict
+	yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+	mean((yhat.boost-boston.test)^2)
+
+# best way is to use Cross validation to choose number of trees
+#ture parameters and compare Mean Square Error
+	boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4,shrinkage=0.2,verbose=F)
+	yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+	mean((yhat.boost-boston.test)^2)
+
+#small test to show how error changes with amount of trees
+         
 
 #--------------------------------------------------------------------------------------------------------
-#BOOSTING 
+#BOOSTING again
 # GBM in CARET with Cross Validation
 
 	library(caret)

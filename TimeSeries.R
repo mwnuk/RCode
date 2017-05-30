@@ -34,6 +34,7 @@
 	acf(diff(log(AirPassengers)))
 	pacf(diff(log(AirPassengers)))
 
+#(p,d,q)=(0,1,1) after few tries to get smallest AIC/BIC
 # BUILD MODEL
 	(fit <- arima(log(AirPassengers), c(0, 1, 1),seasonal = list(order = c(0, 1, 1), period = 12)))
 
