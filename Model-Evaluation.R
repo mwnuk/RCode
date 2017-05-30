@@ -50,46 +50,121 @@ if you have 400 variables and 300 observations (p>n) need to reduce amount of fe
 3. DIMENSION REDUCTION - extracting important combination of variables 
      -Principal Component Regression - liniar combination of original predictor ( part of Unsupervised Learning)  - pick the direction( as a component) where data varies the most 
      -Partial Least Squares - select components in a suprvised way, chose components by looking at the response
+-------------------------------------------------------------------
+VALIDATION
+	-TEST ERROR is the error we incur on a new data, that the model hasn't seen.
+	-TRAINING ERROR is the error we we get applying the model to the same data it was trained from.
+      - Ingredients of e prediction error are
+               - bias - how far off on average the model is from the truth
+               - variance - how much that estimate varies around its average
+	-CROSS_VALIDATION gives good idea about test error of the model
+      -LOOCV- Leave One Out Cross Validation - specail case when we don't have to refit the model at all. Training sets differ by 
+              one observation, so they are very similar. 
+	-BOOTSTRAP VALIDATION is useful to get idea of the variability of sd of en estimate and its bias,
+              it samples from a dataset with replacement, it treats dataset like it would be entire population
+Error is measured by
+ - Mean Square Error  for Quantitative response
+ - MissClassification Error Rate - for Discret Response Classification 
+      
 ---------------------------------------------------
 
-   
+#VALIDATION - split data in to 50% train and 50% test part
+	library(ISLR)
+	set.seed(1)
+	dim(Auto)
+	train=sample(392,196)# take a 196 random elements from 392, because Auto has 392 records
+      length(train)
+	plot(sample)
+
+#Mean Square Error of a liniar fit on Test set 
+	lm.fit=lm(mpg~horsepower,data=Auto,subset=train)
+	attach(Auto)
+	mean((mpg-predict(lm.fit,Auto))[-train]^2)
+
+#Mean Square Error of a polynomial fit degree2 on Test set 
+	lm.fit2=lm(mpg~poly(horsepower,2),data=Auto,subset=train)
+	mean((mpg-predict(lm.fit2,Auto))[-train]^2)
+
+#Mean Square Error of a polynomial fit degree2 on Test set 
+	lm.fit3=lm(mpg~poly(horsepower,3),data=Auto,subset=train)
+	mean((mpg-predict(lm.fit3,Auto))[-train]^2)
+
+----------------------------------------------------------------
+# VALIDATION - Leave-One-Out Cross-Validation LOOCV
+
+	glm.fit=glm(mpg~horsepower,data=Auto)
+	coef(glm.fit)
+	lm.fit=lm(mpg~horsepower,data=Auto)
+	coef(lm.fit)
+
+	library(boot)
+	glm.fit=glm(mpg~horsepower,data=Auto)
+	cv.err=cv.glm(Auto,glm.fit)
+	cv.err$delta
+	cv.error=rep(0,5)
+	for (i in 1:5){
+ 		glm.fit=glm(mpg~poly(horsepower,i),data=Auto)
+		cv.error[i]=cv.glm(Auto,glm.fit)$delta[1]
+	}
+	cv.error
+      mean(cv.error)
+----------------------------------------------------------------
+# VALIDATION k-Fold Cross-Validation
+---	
+#create folds using CARET
+	require(caret)
+	flds <- createFolds(Auto, k = 10, list = TRUE, returnTrain = FALSE)
+	names(flds)[1] <- "train"
+	Auto[ flds[[1]], ]  #fold1
+	Auto[ flds[[2]], ]  #fold2
+
+---
+#10 fold using no packages
+#Randomly shuffle the data
+	Auto<-Auto[sample(nrow(Auto)),]
+
+#Create 10 equally size folds
+	folds <- cut(seq(1,nrow(Auto)),breaks=10,labels=FALSE)
+
+#Perform 10 fold cross validation
+for(i in 1:10){
+    #Segement your data by fold using the which() function 
+    testIndexes <- which(folds==i,arr.ind=TRUE)
+    testData <- Auto[testIndexes, ]
+    trainData <- Auto[-testIndexes, ]
+    #Use the test and train data partitions however you desire...
+
+    #lm.fit2=lm(mpg~poly(horsepower,2),data=Auto,subset=trainData)
+    #mean((mpg-predict(lm.fit2,Auto))[-trainData]^2)
+
+}
 
 
+	set.seed(17)
+	cv.error.10=rep(0,10) #replicates 0 ten times
+	for (i in 1:10){
+		glm.fit=glm(mpg~poly(horsepower,i),data=Auto)
+ 		cv.error.10[i]=cv.glm(Auto,glm.fit,K=10)$delta[1]
+ 	}
+	cv.error.10
+      mean(cv.error.10)
 
-library(glmnet)
-grid=10^seq(10,-2,length=100)
-ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
-dim(coef(ridge.mod))
-ridge.mod$lambda[50]
-coef(ridge.mod)[,50]
-sqrt(sum(coef(ridge.mod)[-1,50]^2))
-ridge.mod$lambda[60]
-coef(ridge.mod)[,60]
-sqrt(sum(coef(ridge.mod)[-1,60]^2))
-predict(ridge.mod,s=50,type="coefficients")[1:20,]
-set.seed(1)
-train=sample(1:nrow(x), nrow(x)/2)
-test=(-train)
-y.test=y[test]
-ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
-ridge.pred=predict(ridge.mod,s=4,newx=x[test,])
-mean((ridge.pred-y.test)^2)
-mean((mean(y[train])-y.test)^2)
-ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
-mean((ridge.pred-y.test)^2)
-ridge.pred=predict(ridge.mod,s=0,newx=x[test,],exact=T)
-mean((ridge.pred-y.test)^2)
-lm(y~x, subset=train)
-predict(ridge.mod,s=0,exact=T,type="coefficients")[1:20,]
-set.seed(1)
-cv.out=cv.glmnet(x[train,],y[train],alpha=0)
-plot(cv.out)
-bestlam=cv.out$lambda.min
-bestlam
-ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
-mean((ridge.pred-y.test)^2)
-out=glmnet(x,y,alpha=0)
-predict(out,type="coefficients",s=bestlam)[1:20,]
+----------------------------------------------------------------
+# VALIDATION - The Bootstrap
 
+	alpha.fn=function(data,index){
+ 		X=data$X[index]
+ 		Y=data$Y[index]
+ 		return((var(Y)-cov(X,Y))/(var(X)+var(Y)-2*cov(X,Y)))
+ 	}
+	alpha.fn(Portfolio,1:100)
+	set.seed(1)
+#take 100 samples with replacement	
+	alpha.fn(Portfolio,sample(100,100,replace=T))
+#take 1000 bootstraps
+	boot.out = boot(Portfolio,alpha.fn,R=1000)
+#looking for standard error
+	boot.out 
+	plot (boot.out)
 
 
