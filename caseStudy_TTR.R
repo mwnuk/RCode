@@ -150,11 +150,11 @@ avgCrossFunct <- function ( data){
 	spots<-seq(from=1,to=(total) )
 	result <-vector(length=total)
 	for( i in 51:length(spots)){
-	      smaup   <- data$sma[ spots[i] ] - data$sma[ spots[i-1] ]
-            emadown <- data$ema[ spots[i] ] - data$ema[ spots[i-1] ]
+	      smadown   <- data$sma[ spots[i] ] - data$sma[ spots[i-1] ]
+            emaup   <- data$ema[ spots[i] ] - data$ema[ spots[i-1] ]
 
-        	if( (smaup<0) & (emadown>0) & (smaup<emadown))
-              	result[i] =1
+        	if( (smadown<0) & (emaup>0) & (data$sma[i]>data$ema[i])  )
+			result[i] =1 
          	else
               	result[i] =0 
        }
@@ -237,7 +237,7 @@ ttrc$tgt  = ifelse( ttrc$tgt  ==1,   min(ttrc$close[start:stop])+5, 0 )
 glm.probes = ifelse( glm.probes >0.5, min(ttrc$close[start:stop])+3, 0 )
 ttrc$avgcross = ifelse( ttrc$avgcross ==1,   min(ttrc$close[start:stop])+2,   0 )
 
-#cbind( ttrc[320:360, c("close","tgt","Dval","D20")] , glm.probes[320:360])
+#cbind( ttrc[320:360], c("close","tgt","Dval","D20")] , glm.probes[320:360])
 
 
 plot( ttrc$close[start:stop],pch=20 )

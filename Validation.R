@@ -18,7 +18,7 @@ http://machinelearningmastery.com/how-to-estimate-model-accuracy-in-r-using-the-
 
 # load the libraries
 	library(caret)
-	#library(klaR)
+	library(klaR)
 # load the iris dataset
 	data(iris)
 # define an 80%/20% train/test random split of the dataset using CARET
@@ -77,7 +77,7 @@ http://machinelearningmastery.com/how-to-estimate-model-accuracy-in-r-using-the-
 # define training control
 	train_control <- trainControl(method="cv", number=10)
 # fix the parameters of the algorithm
-	grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
+	grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE), .adjust=c(FALSE))
 # train the model
 	model <- train(Species~., data=iris, trControl=train_control, method="nb", tuneGrid=grid)
 # summarize results
@@ -97,7 +97,6 @@ fit    <- lm(Species ~ ., data=iris)
 library(DAAG)
 cv.lm(df=iris, fit, m=10) # ten-fold cross validation 
 ??DAAG
-
 
 ###################################################################################
 # 
@@ -119,6 +118,89 @@ cv.lm(df=iris, fit, m=10) # ten-fold cross validation
 	print(model)
 
 
+###################################################################################
+# 
+#  FIVE FOLD CROSS VALIDATION By Hand
+# 
+#  a data instance is left out and a model constructed on all other data instances in 
+#  the training set. This is repeated for all data instances.
+###################################################################################
+library(plyr)
+library(randomForest)
 
+	data <- iris
+
+# in this cross validation example, we use the iris data set to 
+# predict the Sepal Length from the other variables in the dataset 
+# with the random forest model 
+
+
+
+	k = 5 #Folds
+
+# sample from 1 to k, nrow times (the number of observations in the data)
+	data$id <- sample(1:k, nrow(data), replace = TRUE)
+	list <- 1:k
+
+# prediction and testset data frames that we add to with each iteration over
+# the folds
+
+	prediction <- data.frame()	
+	testsetCopy <- data.frame()
+
+#Creating a progress bar to know the status of CV
+
+	progress.bar <- create_progress_bar("text")
+	progress.bar$init(k)
+
+
+
+for (i in 1:k){
+
+  # remove rows with id i from dataframe to create training set
+  # select rows with id i to create test set
+
+  	trainingset <- subset(data, id %in% list[-i])
+
+  	testset <- subset(data, id %in% c(i))
+  
+  # delay to see progress bar
+	Sys.sleep(2) 
+
+  # run a random forest model
+
+  	mymodel <- randomForest(trainingset$Sepal.Length ~ ., data = trainingset, ntree = 100)
+
+                                                     
+
+  # remove response column 1, Sepal.Length
+
+  	temp <- as.data.frame(predict(mymodel, testset[,-1]))
+
+  # append this iteration's predictions to the end of the prediction data frame
+
+  	prediction <- rbind(prediction, temp)
+
+  # append this iteration's test set to the test set copy data frame
+  # keep only the Sepal Length Column
+
+	testsetCopy <- rbind(testsetCopy, as.data.frame(testset[,1]))
+  	progress.bar$step()
+}
+
+
+
+# add predictions and actual Sepal Length values
+
+	result <- cbind(prediction, testsetCopy[, 1])
+
+	names(result) <- c("Predicted", "Actual")
+
+	result$Difference <- abs(result$Actual - result$Predicted)
+
+
+# As an example use Mean Absolute Error as Evalution 
+
+	summary(result$Difference)
 
 
