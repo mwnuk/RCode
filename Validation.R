@@ -1,9 +1,17 @@
 # VALIDATION        
-# 1. Using training set and approximate test validation
+# 1. Indirect: Using training set and approximate test validation
 #       - Cp, AIC,BIC,
-# 2. Test set against traning set using Cross Validation
-#       - by hand
-#       - using CARET or DAAG package
+# 2. Direct: Test set against traning set
+#       - split for training/test data set
+#       - Cross Validation CARET or DAAG package or by hand
+#       - LOOCV - LEaveOne out Cross Validation
+#       - Bootstrap Validation Caret or by hand
+# Validating Classification model 
+#     - Confusion Matrix either by hand or from Caret package, Accuracy, Kappa
+# Validating Regression Models 
+#     - MSE - Mean Square Error 
+# 
+
 ###################################################################################
 
 ###################################################################################
