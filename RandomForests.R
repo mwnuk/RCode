@@ -7,8 +7,19 @@
 #              - XGBoost- parallel processing, fast, handles missing data, build in cross validation
 #              - GBM - slower, easier, build in cross validation
 #
-https://www.analyticsvidhya.com/blog/2016/04/complete-tutorial-tree-based-modeling-scratch-in-python/
-
+#https://www.analyticsvidhya.com/blog/2016/04/complete-tutorial-tree-based-modeling-scratch-in-python/
+#
+# Ubalanced datasets, like rare froud detection 
+#  - underSampling majority class
+#  - overSampling minority class, library(ROSE), RandomOverSampling
+#  - synthetic Minority overSamplig SMOT
+#  - modified SMOT as MSMOTE
+#    Ensamble techniques 
+#  - Adaptiva bagging - combination of regression, NNetworks and Decision Trees   
+#  - Adaptive Boosting - converts week learner/classifier to a strong one ( week has low prediction rate)
+#                        adjust weights in steps depending on a correctness of prediction
+#  - GradientTree boosting - improves prediction in every step
+#
 #----------------------------------------------------------------------------------
 ######################################################################
 # BAGGING from islr
@@ -152,16 +163,99 @@ https://www.analyticsvidhya.com/blog/2016/04/complete-tutorial-tree-based-modeli
 another example of XGBoost at:
 https://github.com/rachar1/DataAnalysis/blob/master/xgboost_Classification.R
 
-#--------------------------------------------------------------------------------------------------------
 
+
+
+############################################################################################################
+#Unbalanced Binary Classification
+############################################################################################################
+
+
+#https://www.analyticsvidhya.com/blog/2016/03/practical-guide-deal-imbalanced-classification-problems/
+#ROSE  package    
+	install.packages("ROSE")
+	library(ROSE)
+# simulated dataset - Half circle filled data
+	data(hacide)
+
+#data set has 3 variables, cls,x1,x2 , two sets: hacide.train, hacide.train
+	str(hacide.train)
+#check classes distribution-only 2% of cls are 1 - severly imbalanced set
+	prop.table(table(hacide.train$cls))
+
+# check prediction accuracy on imbalanced data set
+	library(rpart)
+	treeimb <- rpart(cls ~ ., data = hacide.train)
+	pred.treeimb <- predict(treeimb, newdata = hacide.test)
+# check accuracy of prediction using accuracy.meas from ROSE package
+# measures: precision=1- no false positives, recall=0.02 - a lot of false negatives, F=0,167 - week accuracy of a model
+	accuracy.meas(hacide.test$cls, pred.treeimb[,2])
+#better way to estimate accuracy - 0.6 is a very low score
+	roc.curve(hacide.test$cls, pred.treeimb[,2], plotit = F)
+
+#over sampling until total amount ofsamles is 1960, so there are 980 1s and 980 0s
+	data_balanced_over <- ovun.sample(cls ~ ., data = hacide.train, method = "over",N = 1960)$data
+	table(data_balanced_over$cls)
+#undersampling
+	data_balanced_under <- ovun.sample(cls ~ ., data = hacide.train, method = "under", N = 40, seed = 1)$data
+	table(data_balanced_under$cls)
+#both
+	data_balanced_both <- ovun.sample(cls ~ ., data = hacide.train, method = "both", p=0.5,                             N=1000, seed = 1)$data
+	table(data_balanced_both$cls)
+#package ofers synthetic sampling
+	data.rose <- ROSE(cls ~ ., data = hacide.train, seed = 1)$data
+	table(data.rose$cls)
+
+#build decision tree models
+	tree.rose <- rpart(cls ~ ., data = data.rose)
+	tree.over <- rpart(cls ~ ., data = data_balanced_over)
+	tree.under <- rpart(cls ~ ., data = data_balanced_under)
+	tree.both <- rpart(cls ~ ., data = data_balanced_both)
+
+#make predictions on unseen data
+	pred.tree.rose <- predict(tree.rose, newdata = hacide.test)
+	pred.tree.over <- predict(tree.over, newdata = hacide.test)
+	pred.tree.under <- predict(tree.under, newdata = hacide.test)
+	pred.tree.both <- predict(tree.both, newdata = hacide.test)
+
+#model validation
+#AUC ROSE	
+	roc.curve(hacide.test$cls, pred.tree.rose[,2])
+#AUC Oversampling
+	roc.curve(hacide.test$cls, pred.tree.over[,2])
+#AUC Undersampling
+	roc.curve(hacide.test$cls, pred.tree.under[,2])
+#AUC Both
+	roc.curve(hacide.test$cls, pred.tree.both[,2])
+
+# the winner is Synthetic sampling
+
+###############################################################################################
+# Unbalanced datasets set is balances using Synthetic Minority Oversampling - SMOTE
+# Balanced set is used to train XBoost
+
+
+	library(unbalanced)
+	data(ubIonosphere)
+	?ubIonosphere
+	n<-ncol(rarevent_boost) #last column
+      ...
+
+
+-----------------------
 http://trevorstephens.com/kaggle-titanic-tutorial/r-part-5-random-forests/
 
 Random Forests process has the two sources of randomness:
 1.Bagging takes a randomized sample of the rows in your training set, with replacement
 2.Random Forests take only a subset of variables, typically the square root of the number available.
 
-
 install.packages('randomForest')
 library(randomForest)
 
 library(titanic)
+
+
+
+
+
+
