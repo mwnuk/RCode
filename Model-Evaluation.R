@@ -50,6 +50,43 @@ if you have 400 variables and 300 observations (p>n) need to reduce amount of fe
 3. DIMENSION REDUCTION - extracting important combination of variables 
      -Principal Component Regression - liniar combination of original predictor ( part of Unsupervised Learning)  - pick the direction( as a component) where data varies the most 
      -Partial Least Squares - select components in a suprvised way, chose components by looking at the response
+
+-------------------------------------------------------------------
+SUMMARY 
+lm  - liniar regression
+glm - logistic regression
+lda - Linear Discriminant Analysis
+qda - Quadratic Discriminant Analysis
+knn - K-Nearest Neighbors
+naivebayes - Naive Bayes
+regsubsets -  Best Subset Selection
+regsubsets method="forward" - Forward and Backward Stepwise Selection
+glmnet alpha=0 - Ridge
+glmnet alpha=1 - Lasso
+pcr  - Principal Components Regression
+plsr - Partial Least Squares
+lm(wage~poly(age,4) - non liniar regression - polynomial fit
+lm(wage~bs(age,knots=c(25,40,60)) - splines
+tree - Decision Tree
+randomForest mtry=13  - bagging
+randomForest mtry=6   - random Forest
+gbm - Boosting
+svm - Support Vector Machines 
+prcomp - Principal Components Analysis
+kmeans - K-Means Clustering
+hclust - Hierarchical Clustering
+
+
+
+
+
+
+
+
+
+
+
+
 -------------------------------------------------------------------
 VALIDATION
 	-TEST ERROR is the error we incur on a new data, that the model hasn't seen.
@@ -64,8 +101,8 @@ VALIDATION
               it samples from a dataset with replacement, it treats dataset like it would be entire population
 Error is measured by
  - Mean Square Error  for Quantitative response
- - MissClassification Error Rate - for Discret Response Classification 
-      
+ - MissClassification Error Rate - for Discret Response Classification from Confusion Matrix     
+ 
 ---------------------------------------------------
 
 #VALIDATION - split data in to 50% train and 50% test part

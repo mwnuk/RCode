@@ -222,7 +222,7 @@ Prediction performance 46/50
 
 #Cross validation picks 9 as an optimal value 
 
-#try fiffrent pruning -------------------------
+#try different pruning -------------------------
 	prune.carseats=prune.misclass(tree.carseats,best=9)
 	plot(prune.carseats)
 	text(prune.carseats,pretty=0)
