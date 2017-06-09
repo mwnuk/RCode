@@ -14,7 +14,7 @@
 #  - overSampling minority class, library(ROSE), RandomOverSampling
 #  - synthetic Minority overSamplig SMOT
 #  - modified SMOT as MSMOTE
-#    Ensamble techniques 
+# Another approach Ensamble techniques 
 #  - Adaptiva bagging - combination of regression, NNetworks and Decision Trees   
 #  - Adaptive Boosting - converts week learner/classifier to a strong one ( week has low prediction rate)
 #                        adjust weights in steps depending on a correctness of prediction
@@ -172,13 +172,13 @@ https://github.com/rachar1/DataAnalysis/blob/master/xgboost_Classification.R
 
 
 #https://www.analyticsvidhya.com/blog/2016/03/practical-guide-deal-imbalanced-classification-problems/
-#ROSE  package    
+#ROSE  package ( alternatively 	library(unbalanced))   
 	install.packages("ROSE")
 	library(ROSE)
 # simulated dataset - Half circle filled data
 	data(hacide)
 
-#data set has 3 variables, cls,x1,x2 , two sets: hacide.train, hacide.train
+#data set has 3 variables, cls,x1,x2 , already split into two sets: hacide.train, hacide.train
 	str(hacide.train)
 #check classes distribution-only 2% of cls are 1 - severly imbalanced set
 	prop.table(table(hacide.train$cls))
@@ -230,29 +230,77 @@ https://github.com/rachar1/DataAnalysis/blob/master/xgboost_Classification.R
 
 # the winner is Synthetic sampling
 
-###############################################################################################
-# Unbalanced datasets set is balances using Synthetic Minority Oversampling - SMOTE
-# Balanced set is used to train XBoost
 
 
-	library(unbalanced)
-	data(ubIonosphere)
-	?ubIonosphere
-	n<-ncol(rarevent_boost) #last column
-      ...
+#######################################################################################
+# XBOOST again
+#
+# http://xgboost.readthedocs.io/en/latest/R-package/xgboostPresentation.html
+#
+#  objective functions: regression, classification and ranking
+#
+# Input Type: it takes several types of input data:
+# 	-Dense Matrix: R‘s dense matrix, i.e. matrix ;
+# 	-Sparse Matrix: R‘s sparse matrix, i.e. Matrix::dgCMatrix ;
+# 	-Data File: local data files ;
+# 	-xgb.DMatrix: its own class (recommended).
+#  Note: sparse matrix zeros are not stored in memory
+#######################################################################################
+
+	library( xgboost) 
+# Example dataset - can mushroom be eaten - from the same pacakge
+	data(agaricus.train, package='xgboost')
+	data(agaricus.test, package='xgboost')
+	train <- agaricus.train
+	test <- agaricus.test
+# data in a form of dgCMatrix(sparse) and we are predicting numeric value Label
+	str( train)
+	dim(test$data)
+	dim(test$label)
+
+# objective = "binary:logistic": we will train a binary classification model ;
+# max.deph = 2: the trees won’t be deep, because our case is very simple ;
+# nthread = 2: the number of cpu threads we are going to use;
+# nround = 2: there will be two passes on the data, the second one will enhance the model by further reducing the difference between ground truth and prediction.
+
+	bstSparse <- xgboost(data = train$data, label = train$label, max.depth = 2, eta = 1, nthread = 2, nround = 2, objective = "binary:logistic")
+
+#again - use Verbose 0,1,2 to see the progress
+	bstSparse <- xgboost(data = train$data, label = train$label, max.depth = 2, eta = 1, nthread = 2, nround = 2, objective = "binary:logistic",verbose=2)
+
+# again - Alternatively, you can put your dataset in a dense matrix, i.e. a basic R matrix.
+	bstDense <- xgboost(data = as.matrix(train$data), label = train$label, max.depth = 2, eta = 1, nthread = 2, nround = 2, objective = "binary:logistic")
+
+#prediction
+	pred <- predict(bstSparse, test$data)
+
+# size of the prediction vector
+	print(length(pred))
+
+#model performance - error 0.02 is very resonable
+	err <- mean(as.numeric(pred > 0.5) != test$label)
+	print(paste("test-error=", err))
+
+# FOR ADVANCED FEATURES data needs to be in xgb.DMatrix
+	dtrain <- xgb.DMatrix(data = train$data, label=train$label)
+	dtest  <- xgb.DMatrix(data = test$data, label=test$label)
+
+#Advanced feature 1 - watchlist shows probress in passes
+	watchlist <- list(train=dtrain, test=dtest)
+	bst <- xgb.train(data=dtrain, max.depth=2, eta=1, nthread = 2, nround=2, watchlist=watchlist, objective = "binary:logistic")
+
+#Advanced feature 2 - Linear boosting, instead of default Tree boosting
+	bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
+#feature 3 - save/load model
+	xgb.save(bst, "xgboost.model")
+	bst2 <- xgb.load("xgboost.model")
+	pred2 <- predict(bst2, test$data)
+#feature 4 - compare models
+	print(paste("sum(abs(pred2-pred))=", sum(abs(pred2-pred))))
 
 
------------------------
-http://trevorstephens.com/kaggle-titanic-tutorial/r-part-5-random-forests/
 
-Random Forests process has the two sources of randomness:
-1.Bagging takes a randomized sample of the rows in your training set, with replacement
-2.Random Forests take only a subset of variables, typically the square root of the number available.
 
-install.packages('randomForest')
-library(randomForest)
-
-library(titanic)
 
 
 
