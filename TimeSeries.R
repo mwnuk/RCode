@@ -43,3 +43,72 @@
 	pred <- predict(fit, n.ahead = 10*12)
 
 	ts.plot(AirPassengers,2.718^pred$pred, log = "y", lty = c(1,3))
+
+
+# Apply fitted model to later data
+	air.model2 <- Arima(window(AirPassengers,start=1957),model=air.model)
+
+# Forecast accuracy measures on the log scale.
+# in-sample one-step forecasts.
+	accuracy(air.model)
+# out-of-sample one-step forecasts.
+	accuracy(air.model2)
+# out-of-sample multi-step forecasts
+	accuracy(forecast(air.model,h=48,lambda=NULL),
+      	   log(window(AirPassengers,start=1957)))
+
+
+
+############################################################################
+#
+#  AutoArima 
+#
+#
+#
+#   http://rpubs.com/ajaydecis/ts
+###########################################################################
+	library(Rcmdr)
+	library(RcmdrPlugin.epack)
+	
+	library(quadprog)
+	install.packages(forecast)
+	library(forecast)
+      require(forecast)
+
+	data("AirPassengers")
+	a=ets(AirPassengers)
+	a
+
+	predict(a,10)
+
+	str(predict(a,10))
+
+	b=auto.arima(AirPassengers)
+	b
+
+	predict(b,10)
+      ts.plot(AirPassengers)
+	newdataset=forecast::predar3(b,fore1=48)
+
+
+??arima
+
+############################################################################
+#
+#  Few simple model
+#
+#
+###########################################################################
+# Model 1
+	WWWusage %>% forecast %>% plot
+	fit <- ets(window(WWWusage, end=60))
+	fc <- forecast(WWWusage, model=fit)
+# Model 2
+	fit <- ets(USAccDeaths)
+	plot(forecast(fit,h=48))
+# Model 3
+fit <- Arima(usconsumption[,1], order=c(0,0,3))
+
+http://www.sciencedirect.com/science/article/pii/S0378375802001866
+
+
