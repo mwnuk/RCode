@@ -1,5 +1,19 @@
 http://www.r-tutor.com/elementary-statistics/simple-linear-regression/prediction-interval-linear-regression
 
+# Liniar regression is sensitive to outliers 
+# Model is no good if there is relationship between residuals and predicted Values.
+# Liniar regression suffers from:
+#  -Multi-collinearity - when vars a re corelated, 
+#  -autocorrelation- error terms are time correlated, response from a previous time period becomes a predictor
+#  -heteroskedastisity - when vertical spread of the data is increasing when X changes
+# Liniar regression have small error from Bias and large from a Variance
+# but Polynomial regression has high bias and low variance
+# Performance measure:
+# - Sum Of Sqaure Errors - SSE - sensitive to number of data points
+# - Rsquare - (act-predicted)/(act-mean), range 0-1, bigger better, 
+# - adjusted R2 - does not depend on amount of predictors, use always for models with more then 1 predictor
+# Example: Single Var model with R2=.27 means that 27% of variance can be expalined by that var 
+#
 ### HANDLING NA #####
 options("na.action")  # global setting
 na.omit or na.exclude  - skip

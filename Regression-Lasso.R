@@ -7,10 +7,12 @@ http://stats.stackexchange.com/questions/72251/an-example-lasso-regression-using
 # Note glmnet with alpha=1 alpha=1 for Lasso only 
        glmnet with alpha=1 alpha=0 for Ridge only 
        glmnet with alpha between 0,1 ElasticNet
-# Liniar regression is have small error from Bias and large from a Variance
+# Liniar regression have small error from Bias and large from a Variance
 # This method will increase Bias but minimize the Variance
 # The goal is to find optimal lambda which is a weight between Bias and Varaince
 # When shrinkage parameter lambda is zero it becomes regular liniar regression
+# With large penelty some some coeeficients will become zero in Lasso, but in Ridge
+# they only approach zero.
 ###############################################################
 ## LASSO FOR BINARY OUTPUT
 ###############################################################

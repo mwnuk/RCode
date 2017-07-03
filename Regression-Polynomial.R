@@ -1,15 +1,16 @@
 # NONLINIAR MODELS
 # 1.Polynomials
 # 2.Step function
-# 1.Splines
-# 2.Local Regression
-# 1.General Additive Models GAM
+# 3.Splines
+# 4.Local Regression
+# 5.General Additive Models GAM
 
 
 # 1. POLYNOMIALS
-#https://www.r-bloggers.com/fitting-polynomial-regression-in-r/
-#Danger:high order polynomials (n > 4) may lead to over-fitting
-
+# https://www.r-bloggers.com/fitting-polynomial-regression-in-r/
+# Danger:high order polynomials (n > 4) may lead to over-fitting
+# Liniar regression have small error from Bias and large from a Variance
+# but Polynomial regression has high bias and low variance
 
 	set.seed(20)
 #Predictor (q). Use seq for generating equally spaced sequences fast
@@ -65,7 +66,7 @@
 
 	fit=lm(wage~poly(age,4),data=Wage)
 	coef(summary(fit))
-#notice that first two coefficients are signifficant, 3 one litte less,
+#notice that first two coefficients are signifficant, 3rd one litte less,
 # so looks like cubic polynomial would be sufficient.
 	fit2=lm(wage~poly(age,4,raw=T),data=Wage)
 	coef(summary(fit2))
