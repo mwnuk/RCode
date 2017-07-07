@@ -20,6 +20,38 @@ na.omit or na.exclude  - skip
 na.pass - keep all data including NAs
 na.fail - return object only if contains no missing values
 
+##################################################
+# AUTOCORELLATION TEST 
+#( is there a time component?) 
+# two algorithms: car and lmtest - might be diffrent
+##################################################
+library(car)
+library(lmtest)
+??dwtest
+
+## generate two AR(1) error terms with parameter
+## rho = 0 (white noise) and rho = 0.9 respectively
+	err1 <- rnorm(100)
+
+## generate regressor and dependent variable
+	x <- rep(c(-1,1), 50)
+	y1 <- 1 + x + err1
+
+## perform Durbin-Watson test
+	dwtest(y1 ~ x)
+??stats::filter  AR,MA filter - see more in time series
+	err2 <- filter(err1, rep(1,3), method="recursive")
+	y2 <- 1 + x + err2
+	dwtest(y2 ~ x)
+
+x <- 1:100
+filter(x, rep(1, 3))
+filter(x, rep(1, 3), sides = 1)
+filter(x, rep(1, 3), sides = 1, circular = TRUE)
+
+filter(presidents, rep(1, 3))
+
+
 
 ##################################################
 # SIMPLE LINIAR MODEL
