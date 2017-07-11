@@ -16,7 +16,17 @@ t-distribution is a bell curve, with area under curve equal to probability p-val
 
 http://blog.minitab.com/blog/adventures-in-statistics-2/understanding-t-tests:-1-sample,-2-sample,-and-paired-t-tests
 
+# independent 2-group t-test
+	t.test(y~x) # where y is numeric and x is a binary factor 
+# independent 2-group t-test
+	t.test(y1,y2) # where y1 and y2 are numeric 
+# paired t-test
+	t.test(y1,y2,paired=TRUE) # where y1 & y2 are numeric 
+# one sample t-test
+	t.test(y,mu=3) # Ho: mu=3 
 
+#######################################################################
+# EXAMPLE  one sample t-test
 # Raw dataset -- 32 observations
 data = c(21.75, 18.0875, 18.75, 23.5, 14.125, 16.75, 11.125, 11.125, 14.875, 15.5, 20.875,
             17.125, 19.075, 25.125, 27.75, 29.825, 17.825, 28.375, 22.625, 28.75, 27, 12.825, 
@@ -27,12 +37,30 @@ mean(data)
 # NULL Hypotesis: Mean Value is not equal to 20
 
 # Student t-Test
-t.test(x=data, mu=20, conf.level=0.95)
+	t.test(x=data, mu=20, conf.level=0.95)
 
 # Manually calculate p-value
 
-t.value = (mean(data) - 20) / (sd(data) / sqrt(length(data))) 
-p.value = 2*pt(-abs(t.value), df=length(data)-1)
+	t.value = (mean(data) - 20) / (sd(data) / sqrt(length(data))) 
+	p.value = 2*pt(-abs(t.value), df=length(data)-1)
+	p.value
+	?pt
 
-?pt
+
+#######################################################################
+# ANOVA - Analysis of variance can determine whether the means of three 
+#         or more groups are different. - 
+# F-statistic is simply a ratio of two variances, can estimate signifficance of 
+#   a regression model, or test equality of means
+#
+#See more at: http://blog.minitab.com/blog/adventures-in-statistics-2/understanding-analysis-of-variance-anova-and-the-f-test
+# 
+
+
+http://www.gardenersown.co.uk/Education/Lectures/R/basics.htm#t_test
+
+
+
+
+
 
