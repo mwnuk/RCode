@@ -43,6 +43,17 @@ http://machinelearningmastery.com/how-to-estimate-model-accuracy-in-r-using-the-
 # summarize results
 	confusionMatrix(predictions$class, y_test)
 
+############################################################
+# SIMPLE SPLIT 
+############################################################
+	set.seed(502)
+	ind=sample(2,nrow(iris),replace=T,prob=c(.7,.3))
+	train<-iris[ind==1,]
+	test<-iris[ind==2,]
+length( iris$Species) 
+length( train$Species)
+length( test$Species)
+
 
 ###################################################################################
 #
