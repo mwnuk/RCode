@@ -167,7 +167,7 @@ colnames(xreg) <- c("Mon","Tue","Wed","Thu","Fri","Sat","Day","Christmas")
 head(xreg)
 
 # Variable to be modelled - without frequency it will model all 50 records
-visits <- ts(modelfitsample$Customer_Visit), frequency=7)
+visits <- ts(modelfitsample$Customer_Visit), frequency=7))
 
 # Find ARIMAX model
 modArima <- auto.arima(visits, xreg=xreg)
@@ -218,6 +218,8 @@ plot(stock,type='l', main='log returns plot')
 xreg <- cbind(stock_open,stock_hi,stock_lo,stock_vol )
 
 
+# Variable can be modeled without frequency
+stock_close <- ts(stock_close, frequency=7)
 
 fit3=auto.arima(stock_close,xreg=xreg)
 plot(forecast(fit3,xreg=xreg))

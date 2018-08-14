@@ -9,7 +9,9 @@
 # Validating Classification model 
 #     - Confusion Matrix either by hand or from Caret package, Accuracy, Kappa
 # Validating Regression Models 
-#     - MSE - Mean Square Error 
+#     - MAE - Mean Absolute Error 
+#     - MSE - Mean Square Error - punishes larger errors, 
+#     - RMSE - Root MEan Square Error sqrt(MSE) - increases the weigth of larger errors
 # 
 
 ###################################################################################
